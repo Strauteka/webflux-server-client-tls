@@ -10,6 +10,9 @@ _To create CA signed certificate you can follow tutorials in __WWW___
 <strong>Run _[cert.sh](./cert.sh)_</strong>
 
 Or
+create certs folder  
+`mkdir certs`  
+`cd certs`  
 
 _Generating server self-signed certificate for localhost_  
 `keytool -keystore serverkeystore.jks -alias testserver -genkey -keyalg RSA -validity 365 -dname "CN=testserver, OU=Unknown, O=Unknown, L=Unknown, ST=Unknown, C=Unknown" -keypass ishallpassserver -storepass ishallpassserver -ext san=dns:localhost,ip:127.0.0.1`
