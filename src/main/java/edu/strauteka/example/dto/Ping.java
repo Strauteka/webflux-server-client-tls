@@ -2,7 +2,6 @@ package edu.strauteka.example.dto;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 
 @Data
 @NoArgsConstructor

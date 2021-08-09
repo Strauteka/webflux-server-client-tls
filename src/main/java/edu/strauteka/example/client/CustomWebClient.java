@@ -74,7 +74,7 @@ public class CustomWebClient {
      * .port(port);
      * <p>
      * httpClient.secure(sslSpec -> {
-     * log.info("runnung this");
+     * log.info("running this");
      * sslSpec.sslContext(sslContext);
      * });
      * You will get unrelated error:
@@ -139,15 +139,15 @@ public class CustomWebClient {
         if (!truststoreFile.isReadable()) {
             throw new RuntimeException("Truststore File is not readable!");
         }
-
+        //The Keystore
         KeyStore truststore = KeyStore.getInstance(KeyStore.getDefaultType());
         truststore.load(truststoreFile.getInputStream(), resourceFilePassword.toCharArray());
 
-        //validating server certs
+        //The TrustManagerFactory will query the KeyStore for information about which remote certificates should be trusted during authorization checks.
         TrustManagerFactory trustManagerFactory = TrustManagerFactory
                 .getInstance(TrustManagerFactory.getDefaultAlgorithm());
 
-        //key manager for two way tls
+        //The primary responsibility of the KeyManager is to select the authentication credentials that will eventually be sent to the remote host
         KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
         keyManagerFactory.init(truststore, resourceFilePassword.toCharArray());
 

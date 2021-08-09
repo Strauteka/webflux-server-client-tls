@@ -1,19 +1,46 @@
 # Spring Boot Server - client tls
-### TODO: create documentation!
+### Reactive Ping-pong with two-way ssl
 
-https://erfin-feluzy.medium.com/tutorial-secure-your-api-with-x509-mutual-authentication-with-spring-boot-on-openshift4-416a00a47af8
+_To create CA signed certificate you can follow tutorials in __WWW___  
+[Azure example 1](https://docs.microsoft.com/en-us/azure/iot-hub/tutorial-x509-openssl)   
+[Azure example 2](https://docs.microsoft.com/en-us/azure/iot-hub/tutorial-x509-scripts)  
 
+## Self signed certificate with java keytool for .jks
 
-keytool -keystore serverkeystore.jks -alias testserver -genkey -keyalg RSA -validity 30 -ext san=ip:127.0.0.1
+<strong>Run _[cert.sh](./cert.sh)_</strong>
 
-keytool -keystore clientkeystore.jks -genkey -keyalg RSA -validity 30
+Or
 
-keytool -export -alias testserver -keystore serverkeystore.jks -file testserver.crt
+_Generating server self-signed certificate for localhost_  
+`keytool -keystore serverkeystore.jks -alias testserver -genkey -keyalg RSA -validity 365 -dname "CN=testserver, OU=Unknown, O=Unknown, L=Unknown, ST=Unknown, C=Unknown" -keypass ishallpassserver -storepass ishallpassserver -ext san=dns:localhost,ip:127.0.0.1`
 
-keytool -keystore clientkeystore.jks -import -alias testserver -file testserver.crt -trustcacerts
+_Generating client self-signed certificate_  
+`keytool -keystore clientkeystore.jks -alias clientKey -genkey -keyalg RSA -validity 365 -dname "CN=testserver, OU=Unknown, O=Unknown, L=Unknown, ST=Unknown, C=Unknown" -keypass ishallpassclient -storepass ishallpassclient`
 
-keytool -export -alias mykey -keystore clientkeystore.jks -file client.crt
+_Export servers key public part_  
+`keytool -export -alias testserver -keystore serverkeystore.jks -file testserver.crt -keypass ishallpassserver -storepass ishallpassserver`
 
-servertruststore no need servers ca!
+_Import exported servers .crt to client keystore_  
+`keytool -keystore clientkeystore.jks -import -alias testserver -file testserver.crt -trustcacerts -keypass ishallpassserver -storepass ishallpassclient -noprompt`
 
-keytool -import -trustcacerts  -alias client -file client.crt -keystore servertruststore.jks
+### For two-way ssl
+_Export clients key public part to .crt_
+
+`keytool -export -alias clientKey -keystore clientkeystore.jks -file testclient.crt -keypass ishallpassclient -storepass ishallpassclient`
+
+In some cases there is issue when server requires its own CA in it's truststore, not this case.
+
+_Creating truststore from client .crt_  
+`keytool -import -alias clientAlias -file testclient.crt -keystore servertruststore.jks -storepass ishallpasstruststore -noprompt`
+
+## Other
+_View client .jks_  
+`keytool -list -v -keystore clientkeystore.jks -storepass ishallpassclient`
+
+_Delete alias_  
+`keytool -delete -alias testserver -keystore clientkeystore.jks -storepass ishallpassclient`
+
+_Changes alias_  
+`keytool -changealias -alias "testserver" -destalias "testserverChanged" -keystore serverkeystore.jks -keypass ishallpassserver -storepass ishallpassserver`
+
+_You can allow use of https://127.0.0.1:8080/ping api from browser, if property set server.ssl.client-auth=want_
