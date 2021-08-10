@@ -1,12 +1,8 @@
 #! /bin/bash
 . ./docker.conf
-
+echo "Creating certs"
 bash cert.sh "san=ip:${EXT_IP}"
-
-mvn clean install
-mkdir target/dependency
-cd target/dependency || exit
-jar -xf ../*.jar
-cd ../../
-#create docker image and run container
+echo "Compiling and extracting jar"
+bash jar.sh
+echo "Creating docker image and running container"
 bash docker.sh

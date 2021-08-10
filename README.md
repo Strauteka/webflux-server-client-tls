@@ -52,10 +52,13 @@ _Changes alias_
 _You can allow use of https://127.0.0.1:8080/ping api from browser, if property set server.ssl.client-auth=want_
 
 _Run [cert.sh](./cert.sh) for generating localhost demo certificates_  
-_Run [docker.sh](./docker.sh) to create Docker image and run docker container_  
-_Run [run.sh](./run.sh) to create certs, prepare docker files, run docker_
+_Run [jar.sh](./jar.sh) to compile & extract .jar for docker image_  
+_Run [docker.sh](./docker.sh) to create Docker image and run docker container_   
+_Run: docker-compose.  
+`docker-compose -p test up --force-recreate --build`    
+Make sure cert __ext__ flag ip set correctly_  
 
-To change certs in container   
+To change certs in container     
 [docker run -v /host/path/to/certs:/container/path/to/certs -d IMAGE_ID "update-ca-certificates"](https://stackoverflow.com/questions/26028971/docker-container-ssl-certificates)
 
 

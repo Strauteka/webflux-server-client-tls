@@ -1,0 +1,20 @@
+version: "3.8"
+services:
+    testserver:
+        build:
+            context: ./
+            dockerfile: app.Dockerfile
+        restart: always
+        ports:
+            - "8080:8080/tcp"
+            - "8081:8081/tcp"
+        environment:
+            SERVER_ADDRESS: 0.0.0.0
+            SERVER_PORT: 8080
+            MANAGEMENT_PORT: 8081
+        healthcheck:
+          test: "curl --fail --silent localhost:8081/actuator/health | grep UP || exit 1"
+          interval: 20s
+          timeout: 5s
+          retries: 5
+          start_period: 40s

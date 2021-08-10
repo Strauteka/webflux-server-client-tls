@@ -16,7 +16,5 @@ public class ExampleApplication {
 			log.info("Starting exit...");
 			ctx.close();
 		}));
-
-
 	}
 }
