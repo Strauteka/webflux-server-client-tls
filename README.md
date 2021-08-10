@@ -1,15 +1,18 @@
 # Spring Boot Server - client tls
 ### Reactive Ping-pong with two-way ssl
 
+Example created in Windows environment so possibly changes requires running in other platform.
+_docker.sh winpty is for windows docker to run with -i flag_  
+
 _To create CA signed certificate you can follow tutorials in __WWW___  
 [Azure example 1](https://docs.microsoft.com/en-us/azure/iot-hub/tutorial-x509-openssl)   
 [Azure example 2](https://docs.microsoft.com/en-us/azure/iot-hub/tutorial-x509-scripts)  
 
-## Self signed certificate with java keytool for .jks
+## Self-signed certificate with java keytool for .jks
 
-<strong>Run _[cert.sh](./cert.sh)_</strong>
+<strong>Run _[run.sh](./run.sh)_</strong>
 
-Or
+Or  
 create certs folder  
 `mkdir certs`  
 `cd certs`  
@@ -47,3 +50,12 @@ _Changes alias_
 `keytool -changealias -alias "testserver" -destalias "testserverChanged" -keystore serverkeystore.jks -keypass ishallpassserver -storepass ishallpassserver`
 
 _You can allow use of https://127.0.0.1:8080/ping api from browser, if property set server.ssl.client-auth=want_
+
+_Run [cert.sh](./cert.sh) for generating localhost demo certificates_  
+_Run [docker.sh](./docker.sh) to create Docker image and run docker container_  
+_Run [run.sh](./run.sh) to create certs, prepare docker files, run docker_
+
+To change certs in container   
+[docker run -v /host/path/to/certs:/container/path/to/certs -d IMAGE_ID "update-ca-certificates"](https://stackoverflow.com/questions/26028971/docker-container-ssl-certificates)
+
+

@@ -2,7 +2,7 @@
 . ./cert.conf
 
 function pause(){
- read -s -n 1 -p "Press any key to continue . . ."
+ read -r -s -n 1 -p "Press any key to continue . . ."
  echo ""
 }
 
