@@ -54,54 +54,16 @@ public class CustomWebClient {
 //        final boolean sslEnabled = Boolean.parseBoolean(environment.getProperty("server.ssl.enabled"));
         return WebClient.builder()
                 .baseUrl(baseUrl())
-                .clientConnector(new ReactorClientHttpConnector(completeHttpClient()))
+                .clientConnector(new ReactorClientHttpConnector(createHttpClient(port)))
                 .defaultHeader(HttpHeaders.ACCEPT,
                         MediaType.APPLICATION_NDJSON_VALUE,
                         MediaType.APPLICATION_JSON_VALUE)
                 .build();
     }
 
-    /**
-     * DON'T DO LIKE THIS!!! Dont separate HttpClient build!
-     * HttpClient httpClient = HttpClient.create()
-     * .option(ChannelOption.SO_KEEPALIVE, true)
-     * .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 5000)
-     * .responseTimeout(Duration.ofMillis(5000))
-     * .doOnConnected(conn ->
-     * conn.addHandlerLast(new ReadTimeoutHandler(5000, TimeUnit.MILLISECONDS))
-     * .addHandlerLast(new WriteTimeoutHandler(5000, TimeUnit.MILLISECONDS)))
-     * .host(InetAddress.getLocalHost().getHostAddress())
-     * .port(port);
-     * <p>
-     * httpClient.secure(sslSpec -> {
-     * log.info("running this");
-     * sslSpec.sslContext(sslContext);
-     * });
-     * You will get unrelated error:
-     * Caused by: sun.security.validator.ValidatorException:
-     * PKIX path building failed: sun.security.provider.certpath.SunCertPathBuilderException:
-     * unable to find valid certification path to requested target
-     */
-
-    //todo: provide custom configuration
     @SneakyThrows
-    private HttpClient secureHttpClient(int port) {
-        return HttpClient.create()
-                .option(ChannelOption.SO_KEEPALIVE, true)
-                .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 5000)
-                .responseTimeout(Duration.ofMillis(5000))
-                .doOnConnected(conn ->
-                        conn.addHandlerLast(new ReadTimeoutHandler(5000, TimeUnit.MILLISECONDS))
-                                .addHandlerLast(new WriteTimeoutHandler(5000, TimeUnit.MILLISECONDS)))
-                .host(InetAddress.getLocalHost().getHostAddress())
-                .port(port)
-                .secure(sslSpec -> sslSpec.sslContext(completeTruststoreProvider()));
-    }
-
-    //todo: provide custom configuration
-    @SneakyThrows
-    private HttpClient unsecureHttpClient(int port) {
-        return HttpClient.create()
+    private HttpClient createHttpClient(int port) {
+        HttpClient client = HttpClient.create()
                 .option(ChannelOption.SO_KEEPALIVE, true)
                 .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 5000)
                 .responseTimeout(Duration.ofMillis(5000))
@@ -110,11 +72,11 @@ public class CustomWebClient {
                                 .addHandlerLast(new WriteTimeoutHandler(5000, TimeUnit.MILLISECONDS)))
                 .host(InetAddress.getLocalHost().getHostAddress())
                 .port(port);
-    }
 
-
-    private HttpClient completeHttpClient() {
-        return sslEnabled ? secureHttpClient(port) : unsecureHttpClient(port);
+        if(sslEnabled) {
+                client = client.secure(sslSpec -> sslSpec.sslContext(completeTruststoreProvider()));
+        }
+        return client;
     }
 
     private SslContext completeTruststoreProvider() {
